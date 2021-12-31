@@ -50,10 +50,7 @@ pub fn parse_exec_time(output: &str) -> f64 {
         if !l.contains("elapsed:") {
             acc
         } else {
-            let timing = l
-                .split("(elapsed: ")
-                .last()
-                .unwrap();
+            let timing = l.split("(elapsed: ").last().unwrap();
 
             // see [rust/library/core/src/time.rs](https://git.io/Jy1rI)
             if timing.ends_with("ns)") {
