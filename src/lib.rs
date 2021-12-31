@@ -51,15 +51,15 @@ pub fn parse_exec_time(output: &str) -> f64 {
             acc
         } else {
             let timing = l.split("(elapsed: ").last().unwrap();
-
-            // see [rust/library/core/src/time.rs](https://git.io/Jy1rI)
-            if timing.ends_with("ns)") {
+            // uses `.contains` istd. of `ends_with`: string may contain ANSI escape sequences
+            // possible formats: see [rust/library/core/src/time.rs](https://git.io/Jy1rI)
+            if timing.contains("ns)") {
                 acc // range below rounding precision.
-            } else if timing.ends_with("µs)") {
+            } else if timing.contains("µs)") {
                 acc + parse_time(timing, "µs") / 1000_f64
-            } else if timing.ends_with("ms)") {
+            } else if timing.contains("ms)") {
                 acc + parse_time(timing, "ms")
-            } else if timing.ends_with("s)") {
+            } else if timing.contains("s)") {
                 acc + parse_time(timing, "s") * 1000_f64
             } else {
                 acc
@@ -89,7 +89,7 @@ mod tests {
     fn test_parse_exec_time() {
         assert_approx_eq!(
             parse_exec_time(
-                "🎄 Part 1 🎄\n0 (elapsed: 74.13ns)\n🎄 Part 2 🎄\n0 (elapsed: 50.00ns)"
+                &format!("🎄 Part 1 🎄\n0 (elapsed: 74.13ns){}\n🎄 Part 2 🎄\n0 (elapsed: 50.00ns){}", ANSI_RESET, ANSI_RESET)
             ),
             0_f64
         );
