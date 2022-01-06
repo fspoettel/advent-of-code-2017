@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use itertools::Itertools;
+use std::collections::HashSet;
 
 fn parse(input: &str) -> Vec<Vec<&str>> {
     input
@@ -28,9 +28,8 @@ pub fn part_two(input: &str) -> u32 {
     parse(input)
         .into_iter()
         .filter(|words| {
-            let set: HashSet<Vec<char>> = HashSet::from_iter(words.iter().map(|w| {
-                w.chars().sorted_unstable().collect()
-            }));
+            let set: HashSet<Vec<char>> =
+                HashSet::from_iter(words.iter().map(|w| w.chars().sorted_unstable().collect()));
             set.len() == words.len()
         })
         .count() as u32
