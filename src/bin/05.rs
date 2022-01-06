@@ -1,14 +1,5 @@
 fn parse(input: &str) -> Vec<i32> {
-    input
-        .lines()
-        .filter_map(|l| {
-            if l.is_empty() {
-                None
-            } else {
-                Some(l.parse().unwrap())
-            }
-        })
-        .collect()
+    input.lines().filter_map(|l| l.parse().ok()).collect()
 }
 
 fn resolve_instructions(instructions: &mut Vec<i32>, next_instruction: fn(i32) -> i32) -> u32 {
