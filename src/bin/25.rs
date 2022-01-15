@@ -9,13 +9,8 @@ struct State {
 
 struct Rules {
     write: bool,
-    direction: Direction,
+    direction: bool,
     target_state: char,
-}
-
-enum Direction {
-    Left,
-    Right,
 }
 
 struct Program {
@@ -32,21 +27,18 @@ fn parse(input: &str) -> Option<Program> {
     let default_state = lines.next()?.chars().nth_back(1)?;
     let checksum_at = lines.next()?.split(' ').nth_back(1)?.parse().ok()?;
 
-    let states = lines.chunks(10)
+    let states = lines
+        .chunks(10)
         .into_iter()
         .filter_map(|mut lines| {
             let state = lines.nth(1)?.chars().nth_back(1)?;
 
             let rules_chunks = lines.chunks(4);
-
             let mut rules = rules_chunks.into_iter().filter_map(|mut lines| {
                 let write = lines.nth(1)?.chars().nth_back(1)? == '1';
-                let direction = match lines.next()?.split(' ').last()? {
-                    "right." => Direction::Right,
-                    "left." => Direction::Left,
-                    s => panic!("unexpected direction: {}", s),
-                };
+                let direction = lines.next()?.split(' ').last()? == "right.";
                 let target_state = lines.next()?.chars().nth_back(1)?;
+
                 Some(Rules {
                     write,
                     direction,
@@ -83,20 +75,18 @@ pub fn part_one(input: &str) -> usize {
         let current_state = program.states.get(&state).unwrap();
         let current = tape.entry(cursor).or_default();
 
-        let rules = match current {
-            false => &current_state.falsy,
-            true => &current_state.truthy,
+        let rules = if *current {
+            &current_state.truthy
+        } else {
+            &current_state.falsy
         };
 
         *current = rules.write;
         state = rules.target_state;
-        cursor = match rules.direction {
-            Direction::Left => cursor - 1,
-            Direction::Right => cursor + 1,
-        }
+        cursor += if rules.direction { 1 } else { -1 };
     }
 
-    tape.values().filter(|s| **s).count()
+    tape.values().filter(|&&s| s).count()
 }
 
 pub fn part_two(_: &str) -> u32 {
