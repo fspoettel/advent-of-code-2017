@@ -10,25 +10,23 @@ enum Instruction {
 fn parse(input: &str) -> Vec<Instruction> {
     input
         .split(',')
-        .filter_map(|s| {
-            match s.chars().next()? {
-                's' => Some(Instruction::Spin(s[1..].parse().unwrap())),
-                'x' => {
-                    let mut x = s[1..].split('/');
-                    Some(Instruction::Exchange(
-                        x.next()?.parse().unwrap(),
-                        x.next()?.parse().unwrap(),
-                    ))
-                }
-                'p' => {
-                    let mut x = s[1..].split('/');
-                    Some(Instruction::Partner(
-                        x.next()?.chars().next()?,
-                        x.next()?.chars().next()?,
-                    ))
-                }
-                _ => None,
+        .filter_map(|s| match s.chars().next()? {
+            's' => Some(Instruction::Spin(s[1..].parse().unwrap())),
+            'x' => {
+                let mut x = s[1..].split('/');
+                Some(Instruction::Exchange(
+                    x.next()?.parse().unwrap(),
+                    x.next()?.parse().unwrap(),
+                ))
             }
+            'p' => {
+                let mut x = s[1..].split('/');
+                Some(Instruction::Partner(
+                    x.next()?.chars().next()?,
+                    x.next()?.chars().next()?,
+                ))
+            }
+            _ => None,
         })
         .collect()
 }
