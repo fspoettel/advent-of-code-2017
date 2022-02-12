@@ -1,6 +1,8 @@
 use std::env;
 use std::fs;
 
+pub mod knot_hash;
+
 pub const ANSI_ITALIC: &str = "\x1b[3m";
 pub const ANSI_BOLD: &str = "\x1b[1m";
 pub const ANSI_RESET: &str = "\x1b[0m";
