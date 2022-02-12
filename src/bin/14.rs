@@ -1,6 +1,10 @@
+use aoc::grid::Point;
 use aoc::knot_hash::knot_hash;
+use std::collections::HashSet;
 
-type Grid = [[bool; 128]; 128];
+type Grid = HashSet<Point>;
+
+const GRID_SIZE: usize = 128;
 
 fn to_hex(c: char) -> String {
     format!(
@@ -10,16 +14,16 @@ fn to_hex(c: char) -> String {
 }
 
 fn parse(input: &str) -> Grid {
-    let mut grid = [[false; 128]; 128];
+    let mut grid = HashSet::new();
     let hash_key = input.lines().next().unwrap();
 
-    for (i, row) in grid.iter_mut().enumerate() {
+    for i in 0..GRID_SIZE {
         knot_hash(&format!("{}-{}", hash_key, i))
             .char_indices()
             .for_each(|(j, c)| {
                 for (k, c) in to_hex(c).char_indices() {
                     if c == '1' {
-                        row[j * 4 + k] = true;
+                        grid.insert(Point(i, j * 4 + k));
                     }
                 }
             })
@@ -28,19 +32,37 @@ fn parse(input: &str) -> Grid {
     grid
 }
 
-pub fn part_one(input: &str) -> u32 {
-    let grid = parse(&input);
-    grid.iter()
-        .flat_map(|r| {
-            r.iter()
-                .filter_map(|&x| if x { Some(x as u32) } else { None })
-        })
-        .sum()
+pub fn part_one(input: &str) -> usize {
+    let grid = parse(input);
+    grid.len()
+}
+
+fn remove_with_neighbors(grid: &mut Grid, point: Point) {
+    grid.remove(&point);
+
+    let neighbors: Vec<Point> = point
+        .neighbors(GRID_SIZE - 1, GRID_SIZE - 1, false)
+        .into_iter()
+        .filter(|point| grid.contains(point))
+        .collect();
+
+    for point in neighbors {
+        remove_with_neighbors(grid, point);
+    }
 }
 
 pub fn part_two(input: &str) -> u32 {
-    let grid = parse(&input);
-    0
+    let mut grid = parse(input);
+
+    let mut groups = 0;
+
+    while !grid.is_empty() {
+        groups += 1;
+        let point = grid.iter().next().cloned().unwrap();
+        remove_with_neighbors(&mut grid, point);
+    }
+
+    groups
 }
 
 fn main() {
@@ -62,6 +84,6 @@ mod tests {
     fn test_part_two() {
         use aoc::read_file;
         let input = read_file("examples", 14);
-        assert_eq!(part_two(&input), 0);
+        assert_eq!(part_two(&input), 1242);
     }
 }
