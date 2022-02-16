@@ -1,5 +1,3 @@
-use std::cmp::max;
-
 type Component = (u32, u32);
 type Bridge = Vec<Component>;
 
@@ -49,12 +47,16 @@ fn find_best_long_bridge(bridges: &[Bridge]) -> u32 {
 
     bridges.iter().for_each(|bridge| {
         let len = bridge.len();
-        if len > max_len {
-            max_len = len;
-            max_sum = sum_bridge(bridge);
-        } else if len == max_len {
-            max_sum = max(sum_bridge(bridge), max_sum);
-        }
+        match len.cmp(&max_len) {
+            std::cmp::Ordering::Equal => {
+                max_sum = std::cmp::max(sum_bridge(bridge), max_sum);
+            },
+            std::cmp::Ordering::Greater => {
+                max_len = len;
+                max_sum = sum_bridge(bridge);
+            },
+            _ => {},
+        };
     });
 
     max_sum
