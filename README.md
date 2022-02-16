@@ -26,6 +26,8 @@
 | [Day 15](https://adventofcode.com/2017/day/15) | ⭐ | ⭐ |
 | [Day 16](https://adventofcode.com/2017/day/16) | ⭐ | ⭐ |
 | [Day 17](https://adventofcode.com/2017/day/17) | ⭐ | ⭐ |
+| [Day 19](https://adventofcode.com/2017/day/19) | ⭐ | ⭐ |
+| [Day 24](https://adventofcode.com/2017/day/24) | ⭐ |   |
 | [Day 25](https://adventofcode.com/2017/day/25) | ⭐ |   |
 <!--- advent_readme_stars table --->
 
