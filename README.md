@@ -30,6 +30,7 @@
 | [Day 18](https://adventofcode.com/2017/day/18) | ⭐ |   |
 | [Day 19](https://adventofcode.com/2017/day/19) | ⭐ | ⭐ |
 | [Day 20](https://adventofcode.com/2017/day/20) | ⭐ |   |
+| [Day 22](https://adventofcode.com/2017/day/22) | ⭐ | ⭐ |
 | [Day 24](https://adventofcode.com/2017/day/24) | ⭐ | ⭐ |
 | [Day 25](https://adventofcode.com/2017/day/25) | ⭐ |   |
 <!--- advent_readme_stars table --->
