@@ -2,7 +2,7 @@ fn parse(input: &str) -> Vec<i32> {
     input.lines().filter_map(|l| l.parse().ok()).collect()
 }
 
-fn resolve_instructions(instructions: &mut Vec<i32>, next_instruction: fn(i32) -> i32) -> u32 {
+fn resolve_instructions(instructions: &mut [i32], next_instruction: fn(i32) -> i32) -> u32 {
     let len = instructions.len() as i32;
     let mut step = 1;
     let mut offset: i32 = 0;
