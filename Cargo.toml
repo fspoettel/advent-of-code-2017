@@ -8,3 +8,4 @@ default-run = "aoc"
 
 [dependencies]
 itertools = "0.10.3"
+hashbrown = "0.3"
