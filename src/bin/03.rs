@@ -4,7 +4,8 @@ fn parse(input: &str) -> u32 {
     input.lines().next().unwrap().parse::<u32>().unwrap()
 }
 
-type Position = (i32, i32);
+#[derive(Copy, Clone, Eq, Hash, PartialEq)]
+struct Point(i32, i32);
 
 #[derive(Clone, Copy)]
 enum Orientation {
@@ -14,19 +15,19 @@ enum Orientation {
     West,
 }
 
-type Spiral = HashSet<Position>;
-type Scores = HashMap<(i32, i32), u32>;
+type Spiral = HashSet<Point>;
+type Scores = HashMap<Point, u32>;
 
-fn go(pos: &Position, orientation: &Orientation) -> Position {
+fn go(pos: &Point, orientation: &Orientation) -> Point {
     match orientation {
-        Orientation::North => (pos.0, pos.1 - 1),
-        Orientation::East => (pos.0 + 1, pos.1),
-        Orientation::South => (pos.0, pos.1 + 1),
-        Orientation::West => (pos.0 - 1, pos.1),
+        Orientation::North => Point(pos.0, pos.1 - 1),
+        Orientation::East => Point(pos.0 + 1, pos.1),
+        Orientation::South => Point(pos.0, pos.1 + 1),
+        Orientation::West => Point(pos.0 - 1, pos.1),
     }
 }
 
-fn rotate(spiral: &Spiral, pos: &Position, orientation: &Orientation) -> Orientation {
+fn turn(spiral: &Spiral, pos: &Point, orientation: &Orientation) -> Orientation {
     let next_rotation = match orientation {
         Orientation::North => Orientation::West,
         Orientation::East => Orientation::North,
@@ -41,26 +42,26 @@ fn rotate(spiral: &Spiral, pos: &Position, orientation: &Orientation) -> Orienta
     }
 }
 
-fn sum_neighbors(scores: &Scores, pos: &Position) -> u32 {
-    scores.get(&(pos.0 - 1, pos.1 - 1)).unwrap_or(&0)
-        + scores.get(&(pos.0, pos.1 - 1)).unwrap_or(&0)
-        + scores.get(&(pos.0 + 1, pos.1 - 1)).unwrap_or(&0)
-        + scores.get(&(pos.0 + 1, pos.1)).unwrap_or(&0)
-        + scores.get(&(pos.0 + 1, pos.1 + 1)).unwrap_or(&0)
-        + scores.get(&(pos.0, pos.1 + 1)).unwrap_or(&0)
-        + scores.get(&(pos.0 - 1, pos.1 + 1)).unwrap_or(&0)
-        + scores.get(&(pos.0 - 1, pos.1)).unwrap_or(&0)
+fn sum_neighbors(scores: &Scores, pos: &Point) -> u32 {
+    scores.get(&Point(pos.0 - 1, pos.1 - 1)).unwrap_or(&0)
+        + scores.get(&Point(pos.0, pos.1 - 1)).unwrap_or(&0)
+        + scores.get(&Point(pos.0 + 1, pos.1 - 1)).unwrap_or(&0)
+        + scores.get(&Point(pos.0 + 1, pos.1)).unwrap_or(&0)
+        + scores.get(&Point(pos.0 + 1, pos.1 + 1)).unwrap_or(&0)
+        + scores.get(&Point(pos.0, pos.1 + 1)).unwrap_or(&0)
+        + scores.get(&Point(pos.0 - 1, pos.1 + 1)).unwrap_or(&0)
+        + scores.get(&Point(pos.0 - 1, pos.1)).unwrap_or(&0)
 }
 
 pub fn part_one(input: &str) -> i32 {
     let mut spiral: Spiral = HashSet::new();
-    let mut current_position = (0, 0);
+    let mut current_position = Point(0, 0);
     let mut current_orientation = Orientation::East;
     spiral.insert(current_position);
 
     for _ in 1..parse(input) {
         current_position = go(&current_position, &current_orientation);
-        current_orientation = rotate(&spiral, &current_position, &current_orientation);
+        current_orientation = turn(&spiral, &current_position, &current_orientation);
         spiral.insert(current_position);
     }
 
@@ -72,14 +73,14 @@ pub fn part_two(input: &str) -> u32 {
 
     let mut spiral: Spiral = HashSet::new();
     let mut scores = HashMap::new();
-    let mut current_position = (0, 0);
+    let mut current_position = Point(0, 0);
     let mut current_orientation = Orientation::East;
     spiral.insert(current_position);
     scores.insert(current_position, 1);
 
     loop {
         current_position = go(&current_position, &current_orientation);
-        current_orientation = rotate(&spiral, &current_position, &current_orientation);
+        current_orientation = turn(&spiral, &current_position, &current_orientation);
         let score = sum_neighbors(&scores, &current_position);
         scores.insert(current_position, score);
         spiral.insert(current_position);
