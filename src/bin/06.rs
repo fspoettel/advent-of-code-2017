@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use hashbrown::HashMap;
 
 type Seen = HashMap<Vec<u32>, u32>;
 
@@ -13,11 +13,11 @@ fn parse(input: &str) -> Vec<u32> {
 }
 
 fn find_repetition(state: &mut Vec<u32>, seen: &mut Seen) -> (u32, u32) {
-    let mut step = 0;
+    let mut repetition_at_step = 0;
 
     while !seen.contains_key(state) {
-        seen.insert(state.clone(), step);
-        step += 1;
+        seen.insert(state.clone(), repetition_at_step);
+        repetition_at_step += 1;
 
         let imax = state
             .iter()
@@ -36,7 +36,10 @@ fn find_repetition(state: &mut Vec<u32>, seen: &mut Seen) -> (u32, u32) {
         }
     }
 
-    (step, step - *seen.get(state).unwrap())
+    (
+        repetition_at_step,
+        repetition_at_step - *seen.get(state).unwrap(),
+    )
 }
 
 pub fn part_one(input: &str) -> u32 {

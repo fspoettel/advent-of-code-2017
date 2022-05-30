@@ -29,12 +29,12 @@ struct Instruction<'a> {
 fn parse(input: &str) -> Vec<Instruction> {
     input
         .lines()
-        .filter_map(|l| {
-            if l.is_empty() {
+        .filter_map(|line| {
+            if line.is_empty() {
                 return None;
             }
 
-            let mut parts = l.split(' ');
+            let mut parts = line.split(' ');
 
             let target = parts.next()?;
             let op = parts.next()?;

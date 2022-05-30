@@ -4,7 +4,7 @@ fn parse(input: &str) -> Vec<i32> {
 
 fn resolve_instructions(instructions: &mut [i32], next_instruction: fn(i32) -> i32) -> u32 {
     let len = instructions.len() as i32;
-    let mut step = 1;
+    let mut finished_at_step = 1;
     let mut offset: i32 = 0;
 
     loop {
@@ -13,14 +13,14 @@ fn resolve_instructions(instructions: &mut [i32], next_instruction: fn(i32) -> i
 
         if next_offset < 0 || next_offset >= len {
             break;
+        } else {
+            finished_at_step += 1;
+            offset = next_offset;
+            *instruction = next_instruction(*instruction);
         }
-
-        step += 1;
-        offset = next_offset;
-        *instruction = next_instruction(*instruction);
     }
 
-    step
+    finished_at_step
 }
 
 pub fn part_one(input: &str) -> u32 {

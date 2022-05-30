@@ -30,8 +30,8 @@ fn parse(input: &str) -> Tree {
         parent_edges: HashMap::new(),
     };
 
-    input.lines().fold(tree, |mut acc, l| {
-        let (name, weight_str) = l.split(" (").collect_tuple().unwrap();
+    input.lines().fold(tree, |mut tree, line| {
+        let (name, weight_str) = line.split(" (").collect_tuple().unwrap();
         let (weight, children_str) = weight_str.split(')').collect_tuple().unwrap();
 
         if !children_str.is_empty() {
@@ -43,10 +43,10 @@ fn parse(input: &str) -> Tree {
                 .collect();
 
             for child_name in children.iter() {
-                acc.parent_edges.insert(child_name, name);
+                tree.parent_edges.insert(child_name, name);
             }
 
-            acc.child_edges.insert(name, children);
+            tree.child_edges.insert(name, children);
         }
 
         let node = Node {
@@ -54,9 +54,9 @@ fn parse(input: &str) -> Tree {
             weight: weight.parse().unwrap(),
             weight_children: 0,
         };
-        acc.nodes.insert(name, node);
+        tree.nodes.insert(name, node);
 
-        acc
+        tree
     })
 }
 
@@ -89,11 +89,11 @@ fn get_leaf_node_names<'a, 'b>(tree: &'a Tree<'b>) -> Vec<&'b str> {
         .collect()
 }
 
-fn get_child_nodes<'a>(tree: &'a Tree, node: &'a str) -> Vec<&'a Node<'a>> {
-    let child_names = tree.child_edges.get(node).unwrap();
+fn get_child_nodes<'a>(tree: &'a Tree, name: &'a str) -> Vec<&'a Node<'a>> {
+    let child_names = tree.child_edges.get(name).unwrap();
     child_names
         .iter()
-        .map(|name| tree.nodes.get(name).unwrap())
+        .map(|child_name| tree.nodes.get(child_name).unwrap())
         .collect()
 }
 
@@ -102,31 +102,37 @@ fn get_sibling_nodes<'a>(tree: &'a Tree, name: &'a str) -> Vec<&'a Node<'a>> {
 }
 
 // traverses the tree bottom-up and adds total weight of children to each node.
-fn sum_branch_weights(tree: &mut Tree, nodes: Vec<&str>) {
-    let mut parents = vec![];
+fn sum_branch_weights(tree: &mut Tree, names: Vec<&str>) {
+    let mut parent_names = vec![];
 
-    for name in nodes {
+    for name in names {
         let node = tree.nodes.get(name).unwrap();
-        let parent = tree.parent_edges.get(name);
-        if let Some(parent) = parent {
-            let child_weight =  get_sibling_nodes(tree, node.name).iter().map(|c| c.total_weight()).sum();
-            let parent_node = tree.nodes.get_mut(parent).unwrap();
-            parent_node.weight_children = child_weight;
-            parents.push(*parent);
+        let parent_name = tree.parent_edges.get(name);
+        if let Some(parent_name) = parent_name {
+            let child_weight = get_sibling_nodes(tree, node.name)
+                .iter()
+                .map(|c| c.total_weight())
+                .sum();
+            let parent = tree.nodes.get_mut(parent_name).unwrap();
+            parent.weight_children = child_weight;
+            parent_names.push(parent.name);
         }
     }
 
-    if !parents.is_empty() {
-        sum_branch_weights(tree, parents);
+    if !parent_names.is_empty() {
+        sum_branch_weights(tree, parent_names);
     }
 }
 
 // looks at a set of nodes and returns an unbalanced node if present, None otherwise.
-fn find_unbalanced_node<'a>(nodes: &[&'a Node<'a>]) -> Option<&'a str> {
+fn find_unbalanced_node_name<'a>(nodes: &[&'a Node<'a>]) -> Option<&'a str> {
     let mut weights: HashMap<u32, Vec<&str>> = HashMap::new();
 
     for node in nodes {
-        weights.entry(node.total_weight()).or_default().push(node.name);
+        weights
+            .entry(node.total_weight())
+            .or_default()
+            .push(node.name);
     }
 
     if weights.len() == 1 {
@@ -147,24 +153,24 @@ pub fn part_one(input: &str) -> String {
 
 pub fn part_two(input: &str) -> u32 {
     let mut tree = parse(input);
-    let leaf_nodes = get_leaf_node_names(&tree);
-    sum_branch_weights(&mut tree, leaf_nodes);
+    let leaf_node_names = get_leaf_node_names(&tree);
+    sum_branch_weights(&mut tree, leaf_node_names);
 
     let mut current_node_name = get_root_node_name(&tree);
-    let mut balance: Option<u32> = None;
+    let mut corrected_weight: Option<u32> = None;
 
-    while balance.is_none() {
+    while corrected_weight.is_none() {
         let child_nodes = get_child_nodes(&tree, current_node_name);
-        let unbalanced_node = find_unbalanced_node(&child_nodes);
+        let unbalanced_node_name = find_unbalanced_node_name(&child_nodes);
 
-        match unbalanced_node {
+        match unbalanced_node_name {
             Some(name) => {
                 current_node_name = name;
             }
             None => {
                 let siblings = get_sibling_nodes(&tree, current_node_name);
-                let current_node = tree.nodes.get(current_node_name).unwrap();
-                let current_total = current_node.total_weight();
+                let current = tree.nodes.get(current_node_name).unwrap();
+                let current_total = current.total_weight();
 
                 let canonical_weight = siblings
                     .into_iter()
@@ -178,15 +184,12 @@ pub fn part_two(input: &str) -> u32 {
                     })
                     .unwrap();
 
-                balance = Some(
-                    current_node.weight + canonical_weight
-                        - current_total,
-                );
+                corrected_weight = Some(current.weight + canonical_weight - current_total);
             }
         }
     }
 
-    balance.unwrap()
+    corrected_weight.unwrap()
 }
 
 fn main() {
