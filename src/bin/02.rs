@@ -9,7 +9,11 @@ fn parse(input: &str) -> Vec<Vec<u32>> {
             if l.is_empty() {
                 None
             } else {
-                Some(l.split_whitespace().map(|s| s.parse().unwrap()).collect())
+                Some(
+                    l.split_whitespace()
+                        .filter_map(|s| s.parse().ok())
+                        .collect(),
+                )
             }
         })
         .collect()

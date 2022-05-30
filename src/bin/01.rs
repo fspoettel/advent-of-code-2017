@@ -14,7 +14,8 @@ fn sum_values(values: &[u32], get_target: fn(usize, usize) -> usize) -> u32 {
         .iter()
         .enumerate()
         .filter_map(|(i, &val)| {
-            if val == values[get_target(i, len) % len] {
+            let target_value = values[get_target(i, len) % len];
+            if val == target_value {
                 Some(val)
             } else {
                 None

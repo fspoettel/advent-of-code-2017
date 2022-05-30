@@ -1,5 +1,5 @@
+use hashbrown::HashSet;
 use itertools::Itertools;
-use std::collections::HashSet;
 
 fn parse(input: &str) -> Vec<Vec<&str>> {
     input
@@ -8,31 +8,30 @@ fn parse(input: &str) -> Vec<Vec<&str>> {
             if l.is_empty() {
                 None
             } else {
-                Some(l.split(' ').collect::<Vec<&str>>())
+                let words = l.split(' ').collect::<Vec<&str>>();
+                Some(words)
             }
         })
         .collect()
 }
 
+fn count_valid_passphrases(words: &[Vec<&str>], policy: fn(words: &[&str]) -> bool) -> u32 {
+    words.iter().filter(|words| policy(words)).count() as u32
+}
+
 pub fn part_one(input: &str) -> u32 {
-    parse(input)
-        .into_iter()
-        .filter(|words| {
-            let set: HashSet<&&str> = HashSet::from_iter(words.iter());
-            set.len() == words.len()
-        })
-        .count() as u32
+    count_valid_passphrases(&parse(input), |words| {
+        let valid_words: HashSet<&&str> = HashSet::from_iter(words.iter());
+        valid_words.len() == words.len()
+    })
 }
 
 pub fn part_two(input: &str) -> u32 {
-    parse(input)
-        .into_iter()
-        .filter(|words| {
-            let set: HashSet<Vec<char>> =
-                HashSet::from_iter(words.iter().map(|w| w.chars().sorted_unstable().collect()));
-            set.len() == words.len()
-        })
-        .count() as u32
+    count_valid_passphrases(&parse(input), |words| {
+        let valid_words: HashSet<Vec<char>> =
+            HashSet::from_iter(words.iter().map(|w| w.chars().sorted_unstable().collect()));
+        valid_words.len() == words.len()
+    })
 }
 
 fn main() {
